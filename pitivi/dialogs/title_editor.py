@@ -66,8 +66,9 @@ class TitleEditorDialog(object):
         text = buffer.get_text(*buffer.get_bounds())
         self.preview.props.text = text
 
-    def set(self, **kw):
-        self.__dict__.update(kw)
+# FIXME: what's the point of this thing when we can set it at startup anyway?
+#    def set(self, **kw):
+#        self.__dict__.update(kw)
 
     def _copy_to_dialog(self):
         buffer = self.builder.get_object("textview").props.buffer
