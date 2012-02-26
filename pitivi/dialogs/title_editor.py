@@ -64,6 +64,9 @@ class TitleEditorDialog(object):
         buffer = self.builder.get_object("textview").get_buffer()
         buffer.connect('changed', self._buffer_changed)
 
+        # FIXME: as soon as you try to get this widget connected, you get a MRO
+        #self.builder.get_object("text_align").connect(self._textAlignCb)
+
     def _buffer_changed(self, buffer):
         text = buffer.get_text(*buffer.get_bounds())
         self.preview.props.text = text
