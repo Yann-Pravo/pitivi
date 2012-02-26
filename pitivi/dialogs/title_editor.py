@@ -113,6 +113,12 @@ class TitleEditorDialog(object):
         font_string = widget.get_font_name().rsplit(None, 1)
         self.font, self.text_size = font_string[0], int(font_string[1])
 
+    def _textColorButtonCb(self, widget):
+        self.fg_color = get_color(widget)
+
+    def _bgColorButtonCb(self, widget):
+        self.bg_color = get_color(widget)
+
     def _textAlignCb(self, widget):
         """
         This should set the text alignment type (left, center, right) within
@@ -127,6 +133,11 @@ class TitleEditorDialog(object):
         self._textbuffer.set_text(self.text)
         font_button = self.builder.get_object("font_button")
         font_button.set_font_name('%s %d' % (self.font, self.text_size))
+
+        text_color_button = self.builder.get_object("text_color_button")
+        bg_color_button = self.builder.get_object("bg_color_button")
+        set_color(text_color_button, self.fg_color)
+        set_color(bg_color_button, self.bg_color)
 
     def run(self):
         self.window.show_all()
