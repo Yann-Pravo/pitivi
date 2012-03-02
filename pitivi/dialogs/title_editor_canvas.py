@@ -139,6 +139,9 @@ class TitlePreview(gtk.EventBox):
             raise AttributeError
 
     def do_set_property(self, property, value):
+        """
+        Handle additional things to be done when self's properties change.
+        """
         # Use if clauses with "hasattr" to ensure that the property we're trying
         # to set really has a target object to receive it. This is necessary
         # because do_set_property may be called multiple times before the
