@@ -22,8 +22,6 @@
 
 # TODO: stop updating last_x/last_y when pointer is outside widget
 # TODO: set cursor to indicate draggability when over text item
-# TODO: allow centering the text horizontally and vertically
-# TODO: maintain right margin position when text is right aligned
 # TODO: resize the text according to the scale % of the canvas (vs project resolution)
 # TODO: calculate the canvas aspect ratio from project settings
 
@@ -105,6 +103,7 @@ class TitlePreview(gtk.EventBox):
         self.group.add_child(self.rect1)
         self.group.add_child(self.rect2)
         self.group.add_child(self.text_item)
+        #self.group.add_child(self.image)
         root = self.canvas.get_root_item()
         root.add_child(self.group)
         self.add(self.canvas)
@@ -223,6 +222,9 @@ class TitlePreview(gtk.EventBox):
             dy = canvas_bounds.y1 - group_bounds.y1
         elif group_bounds.y2 + dy > canvas_bounds.y2:
             dy = canvas_bounds.y2 - group_bounds.y2
+
+        self.x = self.x + dx
+        self.y = self.y + dy
 
         self.group.translate(dx, dy)
         #print 'after', (dx, dy)

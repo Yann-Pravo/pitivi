@@ -40,6 +40,7 @@ from hashlib import md5
 from pitivi.configure import get_pixmap_dir
 from pitivi.settings import GlobalSettings
 from pitivi.mediafilespreviewer import PreviewWidget
+from pitivi.dialogs.title_editor import TitleEditorDialog
 from pitivi.dialogs.filelisterrordialog import FileListErrorDialog
 from pitivi.dialogs.clipmediaprops import clipmediapropsDialog
 from pitivi.utils.ui import beautify_length
@@ -92,6 +93,7 @@ ui = '''
                 <separator />
                 <menuitem action="SelectUnusedSources" />
                 <separator />
+                <menuitem action="Titles" />
                 <menuitem action="InsertEnd" />
                 <menuitem action="RemoveSources" />
                 <menuitem action="PreviewClip" />
@@ -102,6 +104,7 @@ ui = '''
     <toolbar name="MainToolBar">
         <placeholder name="MediaLibrary">
             <toolitem action="ImportSources" />
+            <toolitem action="Titles" />
         </placeholder>
     </toolbar>
 </ui>
@@ -464,6 +467,10 @@ class MediaLibraryWidget(gtk.VBox, Loggable):
             None, _("Add the contents of a folder as clips in your project"),
             self._importSourcesFolderCb),
 
+            ("Titles", gtk.STOCK_ADD, _("Create _titles"),
+            None, _("Add titles, credits, subtitles to your project"),
+            self._createTitles),
+
             # Translators: "select" means "find" rather than "choose"
             ("SelectUnusedSources", None, _("Select Unused Media"),
             None, _("Select clips that have not been used in the project"),
@@ -488,6 +495,7 @@ class MediaLibraryWidget(gtk.VBox, Loggable):
         actiongroup = gtk.ActionGroup("medialibrarypermanent")
         actiongroup.add_actions(actions)
         actiongroup.get_action("ImportSources").props.is_important = True
+        actiongroup.get_action("Titles").props.is_important = True
         uiman.insert_action_group(actiongroup, 0)
 
         self.selection_actions = gtk.ActionGroup("medialibraryselection")
@@ -545,6 +553,11 @@ class MediaLibraryWidget(gtk.VBox, Loggable):
 
     def _removeSourcesCb(self, unused_action):
         self._removeSources()
+
+    def _createTitles(self, unused_action):
+        foo = TitleEditorDialog(self.app)
+        title_properties = foo.run()
+        print foo.text
 
     def _selectUnusedSourcesCb(self, widget):
         self._selectUnusedSources()

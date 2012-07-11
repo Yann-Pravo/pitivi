@@ -20,8 +20,6 @@
 # Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-# TODO: fix the alignment ComboBoxText widget
-# TODO: convert the box alignment checkboxes by normal buttons
 # TODO: consider making this an embeddable tab, and put the preview directly onto the viewer (like the transform tool)
 # TODO: replace this gobject property madness by a pythonic property system
 
@@ -33,6 +31,7 @@ from gettext import gettext as _
 from pitivi.configure import get_ui_dir
 from pitivi.dialogs.title_editor_canvas import TitlePreview
 from pitivi.utils.ui import unpack_color, pack_color_32
+from pitivi.utils.loggable import Loggable
 
 
 def get_color(widget):
@@ -62,16 +61,18 @@ def set_color(widget, value):
     widget.set_color(color)
     widget.set_alpha(alpha)
 
-# FIXME: this is not used anywhere
-#alignments = [
-#        (0.0, 0.0), (0.5, 0.0), (1.0, 0.0),
-#        (0.0, 0.5), (0.5, 0.5), (1.0, 0.5),
-#        (0.0, 1.0), (0.5, 1.0), (1.0, 1.0)]
+#class TitleEditorDialog(gtk.VBox, Loggable):
+#
+#    def __init__(self, instance, uiman):
+#	gtk.VBox.__init__(self)
+#	self.app = instance
+#	Loggable.__init__(self)
 
 
 class TitleEditorDialog(object):
 
     def __init__(self, app, **kw):
+
         # **kw means any extra optional keyword arguments.
         # Here, we get those properties (or fallback to a default)
         self.text = kw.get('text', _("Hello! ☃"))
@@ -81,6 +82,8 @@ class TitleEditorDialog(object):
         # Other default settings:
         self.x_alignment = 0.5
         self.y_alignment = 0.5
+        self.size_length = 400
+        self.size_width = 300
 
         self.builder = gtk.Builder()
         self.builder.add_from_file(os.path.join(get_ui_dir(), "texteditor.ui"))
@@ -96,20 +99,17 @@ class TitleEditorDialog(object):
         self._textbuffer = self.builder.get_object("textview").get_buffer()
         self._textbuffer.connect('changed', self._bufferChangedCb)
 
-        # FIXME: as soon as you try to get this widget connected, you get a MRO
-        #self.builder.get_object("text_align").connect(self._textAlignCb)
-
     def _bufferChangedCb(self, widget):
         """
         When the user types in the textview, update the preview canvas.
         """
         text = widget.get_text(*widget.get_bounds())
         self.preview.props.text = text
+        if (self.preview.rect1.props.width >= 400):
+            text = text[:widget.props.cursor_position - 1] + '\n' + text[widget.props.cursor_position - 1:]
+            widget.set_text(text)
+            self.preview.props.text = text
         self.text = text
-
-# FIXME: what's the point of this thing when we can set it at startup anyway?
-#    def set(self, **kw):
-#        self.__dict__.update(kw)
 
     def _fontButtonCb(self, widget):
         self.font = widget.get_font_name()
@@ -128,11 +128,36 @@ class TitleEditorDialog(object):
         self.preview.canvas.props.background_color = bg_color_hex
 
     def _textAlignCb(self, widget):
-        """
-        This should set the text alignment type (left, center, right) within
-        the text box, if possible and if supported by GStreamer.
-        """
-        raise NotImplementedError
+        text = widget.get_active_text()
+        if text == 'Top':
+            self.preview.update_position((self.size_length / 2) - self.preview.x - (self.preview.rect1.props.width / 2), 10 - self.preview.y)
+            #self.x_alignment = (self.size_length / 2)
+            #self.y_alignment = 10
+        elif text == 'Bottom':
+            self.preview.update_position((self.size_length / 2) - self.preview.x - (self.preview.rect1.props.width / 2), self.size_width - (self.preview.y + self.preview.rect1.props.height) - 10)
+            #self.x_alignment = (self.size_length / 2)
+            #self.y_alignment = self.size_width - 10
+        elif text == 'Left':
+            self.preview.update_position(10 - self.preview.x, (self.size_width / 2) - self.preview.y - (self.preview.rect1.props.height / 2))
+            #self.x_alignment = 10
+            #self.y_alignment = self.size_width / 2
+        elif text == 'Right':
+            self.preview.update_position(self.size_length - (self.preview.x + self.preview.rect1.props.width) - 10, (self.size_width / 2) - self.preview.y - (self.preview.rect1.props.height / 2))
+            #self.x_alignment = self.size_length - 10
+            #self.y_alignment = self.size_width / 2
+        elif text == 'Center':
+            self.preview.update_position((self.size_length / 2) - self.preview.x - (self.preview.rect1.props.width / 2), (self.size_width / 2) - self.preview.y - (self.preview.rect1.props.height / 2))
+            #self.x_alignment = self.size_length / 2
+            #self.y_alignment = self.size_width / 2
+        widget.set_active(-1)
+
+    def _centerHorizButtonCb(self, widget):
+        self.preview.update_position((self.size_length / 2) - self.preview.x - (self.preview.rect1.props.width / 2), 0)
+        #self.x_alignment = (self.size_length / 2)
+
+    def _centerVerticButtonCb(self, widget):
+        self.preview.update_position(0, (self.size_width / 2) - self.preview.y - (self.preview.rect1.props.height / 2))
+        #self.y_alignment = (self.size_width / 2)
 
     def _copyDefaultsToDialog(self):
         self._textbuffer.set_text(self.text)

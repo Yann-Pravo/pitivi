@@ -40,6 +40,7 @@ from pitivi.utils.loggable import Loggable
 from pitivi.utils.misc import in_devel
 from pitivi.settings import GlobalSettings
 from pitivi.effects import EffectListWidget
+from pitivi.dialogs.title_editor import TitleEditorDialog
 from pitivi.transitions import TransitionsListWidget
 from pitivi.medialibrary import MediaLibraryWidget, MediaLibraryError
 
@@ -54,7 +55,6 @@ from pitivi.viewer import PitiviViewer
 
 from pitivi.tabsmanager import BaseTabs
 from pitivi.mediafilespreviewer import PreviewWidget
-from pitivi.dialogs.title_editor import TitleEditorDialog
 from pitivi.clipproperties import ClipProperties
 from pitivi.configure import pitivi_version, APPNAME, APPURL, \
      get_pixmap_dir, get_ui_dir
@@ -222,9 +222,9 @@ class PitiviMainWindow(gtk.Window, Loggable):
         self.app.action_log.connect("cleaned", self._actionLogCleaned)
 
         # FIXME: temporary testing hack shit
-        foo = TitleEditorDialog(self.app)
-        title_properties = foo.run()
-        print title_properties
+        #foo = TitleEditorDialog(self.app)
+        #title_properties = foo.run()
+        #print title_properties
 
     def showRenderDialog(self, project):
         """
