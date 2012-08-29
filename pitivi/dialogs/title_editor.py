@@ -62,7 +62,7 @@ def set_color(widget, value):
     widget.set_alpha(alpha)
 
 #class TitleEditorDialog(gtk.VBox, Loggable):
-#
+
 #    def __init__(self, instance, uiman):
 #	gtk.VBox.__init__(self)
 #	self.app = instance
